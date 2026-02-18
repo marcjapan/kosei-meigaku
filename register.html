@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>香星命学｜ご登録</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --ash: #4a4440;
+    --mist: #9a9490;
+    --parchment: #f5f0e8;
+    --cream: #faf7f2;
+    --gold: #b8975a;
+    --gold-light: #d4b07a;
+    --red: #8b2e2e;
+    --border: #ddd8ce;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Serif JP', serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+  }
+
+  /* 背景テクスチャ */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(184,151,90,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,46,46,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  /* ヘッダー */
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .logo-mark::before {
+    content: '香';
+    font-family: 'Shippori Mincho', serif;
+    font-size: 24px;
+    color: var(--gold);
+    letter-spacing: 0;
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(184,151,90,0.3);
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--mist);
+  }
+
+  /* フォームカード */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 40px 36px;
+    position: relative;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  /* セクションタイトル */
+  .section-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* フォームグループ */
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--ash);
+    margin-bottom: 8px;
+  }
+
+  label .required {
+    color: var(--red);
+    margin-left: 4px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    background: var(--cream);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+  }
+
+  input[type="text"]:focus,
+  input[type="date"]:focus,
+  select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,151,90,0.08);
+    background: white;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mist);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  /* 仕切り線 */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 32px 0;
+  }
+
+  /* 送信ボタン */
+  .btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(184,151,90,0.15) 100%);
+  }
+
+  .btn:hover { background: var(--ash); }
+  .btn:active { transform: scale(0.99); }
+  .btn:disabled { background: var(--mist); cursor: not-allowed; }
+
+  /* メッセージ */
+  .msg {
+    margin-top: 16px;
+    padding: 14px 16px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    line-height: 1.6;
+    display: none;
+  }
+
+  .msg.success {
+    background: rgba(184,151,90,0.08);
+    border: 1px solid rgba(184,151,90,0.3);
+    color: var(--ash);
+    display: block;
+  }
+
+  .msg.error {
+    background: rgba(139,46,46,0.06);
+    border: 1px solid rgba(139,46,46,0.2);
+    color: var(--red);
+    display: block;
+  }
+
+  /* ローディング */
+  .loading {
+    display: none;
+    text-align: center;
+    padding: 8px 0;
+    color: var(--mist);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+  }
+
+  .loading.show { display: block; }
+
+  /* 完了画面 */
+  .result-card {
+    display: none;
+    background: white;
+    border: 1px solid var(--border);
+    padding: 40px 36px;
+    position: relative;
+    text-align: center;
+  }
+
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .result-card.show { display: block; }
+
+  .result-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 18px;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .result-sub {
+    font-size: 12px;
+    color: var(--mist);
+    letter-spacing: 0.15em;
+    margin-bottom: 32px;
+  }
+
+  .meishiki-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .meishiki-cell {
+    background: white;
+    padding: 16px 8px;
+    text-align: center;
+  }
+
+  .meishiki-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--mist);
+    margin-bottom: 6px;
+  }
+
+  .meishiki-value {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 18px;
+    color: var(--ink);
+    letter-spacing: 0.1em;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-label {
+    letter-spacing: 0.1em;
+    color: var(--ash);
+  }
+
+  .info-value {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  .user-id-box {
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    padding: 12px 16px;
+    margin: 24px 0;
+    font-size: 11px;
+    color: var(--mist);
+    letter-spacing: 0.1em;
+    word-break: break-all;
+    text-align: left;
+  }
+
+  .user-id-box span {
+    display: block;
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  /* フッター */
+  footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--mist);
+    letter-spacing: 0.15em;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo-mark"></div>
+    <h1>香星命学</h1>
+    <p class="subtitle">KOSEIMEI GAKU — REGISTRATION</p>
+  </header>
+
+  <!-- 登録フォーム -->
+  <div class="card" id="formCard">
+    <div class="section-title">基本情報のご登録</div>
+
+    <div class="form-group">
+      <label>お名前（ニックネームでも可）<span class="required">*</span></label>
+      <input type="text" id="name" placeholder="例：りーさん" maxlength="20">
+    </div>
+
+    <div class="form-group">
+      <label>生年月日<span class="required">*</span></label>
+      <input type="date" id="birthDate" min="1900-01-01" max="2010-12-31">
+    </div>
+
+    <div class="form-group">
+      <label>出生地（都道府県）</label>
+      <div class="select-wrap">
+        <select id="prefecture">
+          <option value="">選択してください</option>
+          <option>北海道</option><option>青森県</option><option>岩手県</option>
+          <option>宮城県</option><option>秋田県</option><option>山形県</option>
+          <option>福島県</option><option>茨城県</option><option>栃木県</option>
+          <option>群馬県</option><option>埼玉県</option><option>千葉県</option>
+          <option>東京都</option><option>神奈川県</option><option>新潟県</option>
+          <option>富山県</option><option>石川県</option><option>福井県</option>
+          <option>山梨県</option><option>長野県</option><option>岐阜県</option>
+          <option>静岡県</option><option>愛知県</option><option>三重県</option>
+          <option>滋賀県</option><option>京都府</option><option>大阪府</option>
+          <option>兵庫県</option><option>奈良県</option><option>和歌山県</option>
+          <option>鳥取県</option><option>島根県</option><option>岡山県</option>
+          <option>広島県</option><option>山口県</option><option>徳島県</option>
+          <option>香川県</option><option>愛媛県</option><option>高知県</option>
+          <option>福岡県</option><option>佐賀県</option><option>長崎県</option>
+          <option>熊本県</option><option>大分県</option><option>宮崎県</option>
+          <option>鹿児島県</option><option>沖縄県</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">お相手の情報（任意）</div>
+
+    <div class="form-group">
+      <label>お相手のお名前（ニックネームでも可）</label>
+      <input type="text" id="partnerName" placeholder="例：たろうさん" maxlength="20">
+    </div>
+
+    <div class="form-group">
+      <label>お相手の生年月日</label>
+      <input type="date" id="partnerBirthDate" min="1900-01-01" max="2010-12-31">
+    </div>
+
+    <div class="form-group">
+      <label>お相手の出生地（都道府県）</label>
+      <div class="select-wrap">
+        <select id="partnerPrefecture">
+          <option value="">選択してください</option>
+          <option>北海道</option><option>青森県</option><option>岩手県</option>
+          <option>宮城県</option><option>秋田県</option><option>山形県</option>
+          <option>福島県</option><option>茨城県</option><option>栃木県</option>
+          <option>群馬県</option><option>埼玉県</option><option>千葉県</option>
+          <option>東京都</option><option>神奈川県</option><option>新潟県</option>
+          <option>富山県</option><option>石川県</option><option>福井県</option>
+          <option>山梨県</option><option>長野県</option><option>岐阜県</option>
+          <option>静岡県</option><option>愛知県</option><option>三重県</option>
+          <option>滋賀県</option><option>京都府</option><option>大阪府</option>
+          <option>兵庫県</option><option>奈良県</option><option>和歌山県</option>
+          <option>鳥取県</option><option>島根県</option><option>岡山県</option>
+          <option>広島県</option><option>山口県</option><option>徳島県</option>
+          <option>香川県</option><option>愛媛県</option><option>高知県</option>
+          <option>福岡県</option><option>佐賀県</option><option>長崎県</option>
+          <option>熊本県</option><option>大分県</option><option>宮崎県</option>
+          <option>鹿児島県</option><option>沖縄県</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <button class="btn" id="submitBtn" onclick="submitForm()">
+      命式を読み解く
+    </button>
+
+    <div class="loading" id="loading">読み解いています……</div>
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <!-- 完了画面 -->
+  <div class="result-card" id="resultCard">
+    <div class="result-title">命式が整いました</div>
+    <p class="result-sub">あなたの香の配置をお伝えします</p>
+
+    <div class="meishiki-grid">
+      <div class="meishiki-cell">
+        <div class="meishiki-label">年 柱</div>
+        <div class="meishiki-value" id="r-year">—</div>
+      </div>
+      <div class="meishiki-cell">
+        <div class="meishiki-label">月 柱</div>
+        <div class="meishiki-value" id="r-month">—</div>
+      </div>
+      <div class="meishiki-cell">
+        <div class="meishiki-label">日 柱</div>
+        <div class="meishiki-value" id="r-day">—</div>
+      </div>
+    </div>
+
+    <div class="info-row">
+      <span class="info-label">五行バランス</span>
+      <span class="info-value" id="r-gogyo">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">循香期（天中殺）</span>
+      <span class="info-value" id="r-tenchu">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">太陽星座</span>
+      <span class="info-value" id="r-sun">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">月星座</span>
+      <span class="info-value" id="r-moon">—</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">金星星座</span>
+      <span class="info-value" id="r-venus">—</span>
+    </div>
+
+    <div class="user-id-box">
+      <span>あなたの登録ID（マイページアクセスに使用）</span>
+      <strong id="r-userId">—</strong>
+    </div>
+
+    <button class="btn" onclick="goMypage()">マイページへ</button>
+  </div>
+
+  <footer>© 香星命学</footer>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzs6k1RpPw2CgZqQmkSVBjHrXbLeO5WCuU3nKBu0Ga7TFjKyOHdfoatt7kdlMiEL4sR0Q/exec';
+
+async function submitForm() {
+  const name      = document.getElementById('name').value.trim();
+  const birthDate = document.getElementById('birthDate').value;
+  const prefecture = document.getElementById('prefecture').value;
+  const msg       = document.getElementById('msg');
+  const loading   = document.getElementById('loading');
+  const btn       = document.getElementById('submitBtn');
+
+  // バリデーション
+  msg.className = 'msg';
+  msg.style.display = 'none';
+
+  if (!name) {
+    showMsg('お名前をご入力ください。', 'error');
+    return;
+  }
+  if (!birthDate) {
+    showMsg('生年月日をご選択ください。', 'error');
+    return;
+  }
+
+  // 送信中
+  btn.disabled = true;
+  loading.classList.add('show');
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'register',
+        name,
+        birthDate,
+        prefecture,
+        partnerName,
+        partnerBirthDate,
+        partnerPrefecture
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.error) {
+      showMsg(data.error, 'error');
+      return;
+    }
+
+    // 完了画面へ
+    document.getElementById('r-year').textContent   = data.yearPillar  || '—';
+    document.getElementById('r-month').textContent  = data.monthPillar || '—';
+    document.getElementById('r-day').textContent    = data.dayPillar   || '—';
+    document.getElementById('r-gogyo').textContent  = data.gogyo       || '—';
+    document.getElementById('r-tenchu').textContent = data.tenchu      || '—';
+    document.getElementById('r-sun').textContent    = data.sunSign     || '—';
+    document.getElementById('r-moon').textContent   = data.moonSign    || '—';
+    document.getElementById('r-venus').textContent  = data.venusSign   || '—';
+    document.getElementById('r-userId').textContent = data.userId      || '—';
+
+    // userIdをlocalStorageに保存
+    localStorage.setItem('koseiUserId', data.userId);
+
+    document.getElementById('formCard').style.display = 'none';
+    document.getElementById('resultCard').classList.add('show');
+
+  } catch(err) {
+    showMsg('通信エラーが発生しました。しばらく経ってからお試しください。', 'error');
+  } finally {
+    btn.disabled = false;
+    loading.classList.remove('show');
+  }
+}
+
+function showMsg(text, type) {
+  const msg = document.getElementById('msg');
+  msg.textContent = text;
+  msg.className = 'msg ' + type;
+  msg.style.display = 'block';
+}
+
+function goMypage() {
+  const userId = document.getElementById('r-userId').textContent;
+  window.location.href = 'mypage.html?userId=' + userId;
+}
+</script>
+</body>
+</html>
