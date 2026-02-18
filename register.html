@@ -497,7 +497,7 @@
     </div>
 
     <div class="info-row">
-      <span class="info-label">五行バランス</span>
+      <span class="info-label">五香の配置</span>
       <span class="info-value" id="r-gogyo">—</span>
     </div>
     <div class="info-row">
@@ -582,7 +582,22 @@ async function submitForm() {
     document.getElementById('r-year').textContent   = data.yearPillar  || '—';
     document.getElementById('r-month').textContent  = data.monthPillar || '—';
     document.getElementById('r-day').textContent    = data.dayPillar   || '—';
-    document.getElementById('r-gogyo').textContent  = data.gogyo       || '—';
+    // 五行→五香に変換して表示
+    const gogyoToKoko = (gogyo) => {
+      if (!gogyo) return '—';
+      // 例: 木1火2土2金0水1 → 森香1・焔香2・穏香2・澄香0・流香1
+      return gogyo
+        .replace(/木(\d+)/g, '森香$1')
+        .replace(/火(\d+)/g, '焔香$1')
+        .replace(/土(\d+)/g, '穏香$1')
+        .replace(/金(\d+)/g, '澄香$1')
+        .replace(/水(\d+)/g, '流香$1')
+        .replace(/(森香\d+)(焔香)/g, '$1・$2')
+        .replace(/(焔香\d+)(穏香)/g, '$1・$2')
+        .replace(/(穏香\d+)(澄香)/g, '$1・$2')
+        .replace(/(澄香\d+)(流香)/g, '$1・$2');
+    };
+    document.getElementById('r-gogyo').textContent  = gogyoToKoko(data.gogyo);
     document.getElementById('r-tenchu').textContent = data.tenchu      || '—';
     document.getElementById('r-sun').textContent    = data.sunSign     || '—';
     document.getElementById('r-moon').textContent   = data.moonSign    || '—';
