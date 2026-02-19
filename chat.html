@@ -552,7 +552,9 @@ async function sendMessage() {
         message: text
       })
     });
-    const data = await res.json();
+    const rawText = await res.text();
+    let data;
+    try { data = JSON.parse(rawText); } catch(e) { data = {}; }
     hideTyping();
 
     if (data.reply) {
@@ -569,11 +571,12 @@ async function sendMessage() {
     } else if (data.error === 'trial_ended') {
       addMessage('ai', '本格鑑定をご購入いただくと、1ヶ月間、香の巫女との対話が無制限でご利用いただけます🕯️', false);
     } else {
-      addMessage('ai', '少し時間をおいて、もう一度お話しかけてください🌿', false);
+      // デバッグ用：レスポンス内容を表示
+      addMessage('ai', 'DBG:' + rawText.substring(0, 200), false);
     }
   } catch(e) {
     hideTyping();
-    addMessage('ai', '少し時間をおいて、もう一度お話しかけてください🌿', false);
+    addMessage('ai', 'CATCH:' + e.toString(), false);
   }
 
   isSending = false;
