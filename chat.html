@@ -652,6 +652,7 @@ async function init() {
   } catch(e) {
     console.error(e);
     loading.style.display = 'none';
+    errorMsg.innerHTML = 'init catch: ' + e.toString();
     errorMsg.style.display = 'block';
   }
 }
