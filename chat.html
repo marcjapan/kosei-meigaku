@@ -611,12 +611,22 @@ async function init() {
     lineUserId = profile.userId;
 
     // ユーザー情報取得
-    const res = await fetch(`${GAS_API_URL}?action=getUserByLineId&lineUserId=${encodeURIComponent(lineUserId)}`);
-    const data = await res.json();
+    let data;
+    try {
+      const res = await fetch(`${GAS_API_URL}?action=getUserByLineId&lineUserId=${encodeURIComponent(lineUserId)}`);
+      const text = await res.text();
+      data = JSON.parse(text);
+    } catch(fetchErr) {
+      loading.style.display = 'none';
+      errorMsg.innerHTML = 'fetch error: ' + fetchErr.toString();
+      errorMsg.style.display = 'block';
+      return;
+    }
 
     loading.style.display = 'none';
 
     if (!data.user) {
+      errorMsg.innerHTML = 'user error: ' + JSON.stringify(data);
       errorMsg.style.display = 'block';
       return;
     }
