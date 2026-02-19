@@ -529,6 +529,7 @@ function gogyoToKoko(gogyo) {
 const LIFF_ID = '2009167670-N4cS2VFK';
 const urlParams = new URLSearchParams(window.location.search);
 const urlUserId = urlParams.get('userId');
+let currentLineUserId = null; // グローバルで保持
 
 window.addEventListener('load', async () => {
   // まずLIFF初期化を試みる
@@ -536,8 +537,8 @@ window.addEventListener('load', async () => {
     await liff.init({ liffId: LIFF_ID });
     if (liff.isLoggedIn()) {
       const profile = await liff.getProfile();
-      const lineUserId = profile.userId;
-      loadUserByLineId(lineUserId);
+      currentLineUserId = profile.userId;
+      loadUserByLineId(currentLineUserId);
       return;
     } else if (liff.isInClient()) {
       // LIFF内ブラウザだがログインしていない場合
@@ -644,6 +645,7 @@ function setSelect(id, value) {
 
 async function updateUser() {
   const userId = localStorage.getItem('koseiUserId');
+  const lineUserId = currentLineUserId;
   const name      = document.getElementById('e-name').value.trim();
   const birthDate = document.getElementById('e-birthDate').value;
   const prefecture = document.getElementById('e-prefecture').value;
@@ -659,7 +661,7 @@ async function updateUser() {
       method: 'POST',
       body: JSON.stringify({
         action: 'update',
-        userId, name, birthDate, prefecture,
+        userId, lineUserId, name, birthDate, prefecture,
         partnerName, partnerBirthDate, partnerPrefecture
       })
     });
