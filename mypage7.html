@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>香星命学｜マイページ</title>
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1410;
+    --ash: #4a4440;
+    --mist: #9a9490;
+    --parchment: #f5f0e8;
+    --cream: #faf7f2;
+    --gold: #b8975a;
+    --gold-light: #d4b07a;
+    --red: #8b2e2e;
+    --border: #ddd8ce;
+    --green: #3a6a4a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* タブ */
+  .tabs {
+    display: flex;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 24px;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    background: var(--cream);
+    z-index: 10;
+    padding-top: 8px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 12px 8px;
+    background: none;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    margin-bottom: -1.5px;
+    font-family: 'Noto Serif JP', serif;
+    font-size: 12px;
+    color: var(--mist);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* 購入情報 */
+  .purchase-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: var(--parchment);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  .status-label {
+    font-size: 12px;
+    color: var(--ash);
+    letter-spacing: 0.05em;
+  }
+
+  .status-badge {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .status-badge.active {
+    background: rgba(58,106,74,0.1);
+    color: #2a6a3a;
+    border: 1px solid rgba(58,106,74,0.3);
+  }
+
+  .status-badge.inactive {
+    background: rgba(154,148,144,0.1);
+    color: var(--mist);
+    border: 1px solid var(--border);
+  }
+
+  .status-expire {
+    font-size: 11px;
+    color: var(--mist);
+    margin-top: 4px;
+  }
+
+  /* 履歴テーブル */
+  .history-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--mist);
+    font-size: 13px;
+    line-height: 2;
+  }
+
+  .history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .history-date {
+    color: var(--ash);
+    font-size: 12px;
+  }
+
+  .history-amount {
+    color: var(--gold);
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  body {
+    font-family: 'Noto Serif JP', serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 80px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse at 20% 20%, rgba(184,151,90,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(139,46,46,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .logo-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .logo-mark::before {
+    content: '香';
+    font-family: 'Shippori Mincho', serif;
+    font-size: 24px;
+    color: var(--gold);
+  }
+
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    border: 0.5px solid rgba(184,151,90,0.3);
+  }
+
+  h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    color: var(--mist);
+  }
+
+  /* カード */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 40px 36px;
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .section-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  /* 命式グリッド */
+  .meishiki-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .meishiki-cell {
+    background: white;
+    padding: 16px 8px;
+    text-align: center;
+  }
+
+  .meishiki-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--mist);
+    margin-bottom: 6px;
+  }
+
+  .meishiki-value {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 20px;
+    color: var(--ink);
+    letter-spacing: 0.1em;
+  }
+
+  /* 情報行 */
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .info-row:last-child { border-bottom: none; }
+
+  .info-label {
+    letter-spacing: 0.1em;
+    color: var(--ash);
+  }
+
+  .info-value {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  /* フォーム */
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    color: var(--ash);
+    margin-bottom: 8px;
+  }
+
+  label .required {
+    color: var(--red);
+    margin-left: 4px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    background: var(--cream);
+    font-family: 'Noto Serif JP', serif;
+    font-size: 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,151,90,0.08);
+    background: white;
+  }
+
+  .select-wrap {
+    position: relative;
+  }
+
+  .select-wrap::after {
+    content: '▾';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mist);
+    font-size: 12px;
+    pointer-events: none;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* ボタン */
+  .btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--ink);
+    color: var(--parchment);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 40%, rgba(184,151,90,0.15) 100%);
+  }
+
+  .btn:hover { background: var(--ash); }
+  .btn:disabled { background: var(--mist); cursor: not-allowed; }
+
+  .btn-outline {
+    width: 100%;
+    padding: 14px;
+    background: transparent;
+    color: var(--ash);
+    font-family: 'Shippori Mincho', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+  }
+
+  /* メッセージ */
+  .msg {
+    margin-top: 12px;
+    padding: 12px 16px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    display: none;
+  }
+
+  .msg.success {
+    background: rgba(58,106,74,0.08);
+    border: 1px solid rgba(58,106,74,0.3);
+    color: var(--green);
+    display: block;
+  }
+
+  .msg.error {
+    background: rgba(139,46,46,0.06);
+    border: 1px solid rgba(139,46,46,0.2);
+    color: var(--red);
+    display: block;
+  }
+
+  /* ローディング */
+  #loadingScreen {
+    text-align: center;
+    padding: 80px 0;
+    color: var(--mist);
+    font-size: 13px;
+    letter-spacing: 0.2em;
+  }
+
+  /* IDログイン */
+  #loginSection { display: block; }
+  #mainSection  { display: none; }
+
+  .user-id-hint {
+    font-size: 11px;
+    color: var(--mist);
+    letter-spacing: 0.1em;
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  footer {
+    margin-top: 32px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--mist);
+    letter-spacing: 0.15em;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo-mark"></div>
+    <h1>香星命学</h1>
+    <p class="subtitle">KOSEIMEI GAKU — MY PAGE</p>
+  </header>
+
+  <!-- ローディング -->
+  <div id="loadingScreen" style="display:none;">読み込んでいます……</div>
+
+  <!-- ログインセクション -->
+  <div id="loginSection">
+    <div class="card">
+      <div class="section-title">登録IDでアクセス</div>
+      <div class="form-group">
+        <label>あなたの登録ID<span class="required">*</span></label>
+        <input type="text" id="inputUserId" placeholder="u_xxxxxxxxxxxx">
+        <p class="user-id-hint">登録完了画面に表示されたIDを入力してください</p>
+      </div>
+      <button class="btn" onclick="loadUser()">マイページを開く</button>
+      <div class="msg" id="loginMsg"></div>
+    </div>
+    <div style="text-align:center; margin-top:16px;">
+      <a href="register.html" style="font-size:12px; color:var(--mist); letter-spacing:0.15em;">まだ登録していない方はこちら</a>
+    </div>
+  </div>
+
+  <!-- メインセクション -->
+  <div id="mainSection">
+
+    <!-- タブ -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('tab-basic')">基本情報</button>
+      <button class="tab-btn" onclick="switchTab('tab-purchase')">購入情報</button>
+      <button class="tab-btn" onclick="switchTab('tab-history')">本鑑定履歴</button>
+    </div>
+
+    <div id="tab-basic" class="tab-panel active">
+
+    <!-- 命式カード -->
+    <div class="card">
+      <div class="section-title">命式・香の配置</div>
+
+      <div class="meishiki-grid">
+        <div class="meishiki-cell">
+          <div class="meishiki-label">年 柱</div>
+          <div class="meishiki-value" id="m-year">—</div>
+        </div>
+        <div class="meishiki-cell">
+          <div class="meishiki-label">月 柱</div>
+          <div class="meishiki-value" id="m-month">—</div>
+        </div>
+        <div class="meishiki-cell">
+          <div class="meishiki-label">日 柱</div>
+          <div class="meishiki-value" id="m-day">—</div>
+        </div>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">五香の配置</span>
+        <span class="info-value" id="m-gogyo">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">循香期（天中殺）</span>
+        <span class="info-value" id="m-tenchu">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">太陽星座</span>
+        <span class="info-value" id="m-sun">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">月星座</span>
+        <span class="info-value" id="m-moon">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">金星星座</span>
+        <span class="info-value" id="m-venus">—</span>
+      </div>
+    </div>
+
+    <!-- 基本情報編集カード -->
+    <div class="card">
+      <div class="section-title">基本情報</div>
+
+      <div class="form-group">
+        <label>お名前<span class="required">*</span></label>
+        <input type="text" id="e-name" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label>生年月日<span class="required">*</span></label>
+        <input type="date" id="e-birthDate" min="1900-01-01" max="2010-12-31">
+      </div>
+      <div class="form-group">
+        <label>出生地（都道府県）</label>
+        <div class="select-wrap">
+          <select id="e-prefecture">
+            <option value="">選択してください</option>
+            <option>北海道</option><option>青森県</option><option>岩手県</option>
+            <option>宮城県</option><option>秋田県</option><option>山形県</option>
+            <option>福島県</option><option>茨城県</option><option>栃木県</option>
+            <option>群馬県</option><option>埼玉県</option><option>千葉県</option>
+            <option>東京都</option><option>神奈川県</option><option>新潟県</option>
+            <option>富山県</option><option>石川県</option><option>福井県</option>
+            <option>山梨県</option><option>長野県</option><option>岐阜県</option>
+            <option>静岡県</option><option>愛知県</option><option>三重県</option>
+            <option>滋賀県</option><option>京都府</option><option>大阪府</option>
+            <option>兵庫県</option><option>奈良県</option><option>和歌山県</option>
+            <option>鳥取県</option><option>島根県</option><option>岡山県</option>
+            <option>広島県</option><option>山口県</option><option>徳島県</option>
+            <option>香川県</option><option>愛媛県</option><option>高知県</option>
+            <option>福岡県</option><option>佐賀県</option><option>長崎県</option>
+            <option>熊本県</option><option>大分県</option><option>宮崎県</option>
+            <option>鹿児島県</option><option>沖縄県</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">お相手の情報（任意）</div>
+
+      <div class="form-group">
+        <label>お相手のお名前</label>
+        <input type="text" id="e-partnerName" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label>お相手の生年月日</label>
+        <input type="date" id="e-partnerBirthDate" min="1900-01-01" max="2010-12-31">
+      </div>
+      <div class="form-group">
+        <label>お相手の出生地（都道府県）</label>
+        <div class="select-wrap">
+          <select id="e-partnerPrefecture">
+            <option value="">選択してください</option>
+            <option>北海道</option><option>青森県</option><option>岩手県</option>
+            <option>宮城県</option><option>秋田県</option><option>山形県</option>
+            <option>福島県</option><option>茨城県</option><option>栃木県</option>
+            <option>群馬県</option><option>埼玉県</option><option>千葉県</option>
+            <option>東京都</option><option>神奈川県</option><option>新潟県</option>
+            <option>富山県</option><option>石川県</option><option>福井県</option>
+            <option>山梨県</option><option>長野県</option><option>岐阜県</option>
+            <option>静岡県</option><option>愛知県</option><option>三重県</option>
+            <option>滋賀県</option><option>京都府</option><option>大阪府</option>
+            <option>兵庫県</option><option>奈良県</option><option>和歌山県</option>
+            <option>鳥取県</option><option>島根県</option><option>岡山県</option>
+            <option>広島県</option><option>山口県</option><option>徳島県</option>
+            <option>香川県</option><option>愛媛県</option><option>高知県</option>
+            <option>福岡県</option><option>佐賀県</option><option>長崎県</option>
+            <option>熊本県</option><option>大分県</option><option>宮崎県</option>
+            <option>鹿児島県</option><option>沖縄県</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn" onclick="updateUser()">情報を更新する</button>
+      <div class="msg" id="updateMsg"></div>
+    </div>
+
+    </div><!-- /tab-basic -->
+
+    <!-- 購入情報タブ -->
+    <div id="tab-purchase" class="tab-panel">
+      <div class="card">
+        <div class="section-title">相談チャット</div>
+        <div class="purchase-status">
+          <div>
+            <div class="status-label">香の巫女との対話</div>
+            <div class="status-expire" id="chat-expire-text"></div>
+          </div>
+          <span class="status-badge" id="chat-status-badge">—</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">支払い履歴</div>
+        <div id="payment-history">
+          <div class="history-empty">まだ購入履歴がありません。</div>
+        </div>
+      </div>
+    </div><!-- /tab-purchase -->
+
+    <!-- 本鑑定履歴タブ -->
+    <div id="tab-history" class="tab-panel">
+      <div class="card">
+        <div id="kansei-history">
+          <div class="history-empty">本鑑定の履歴はまだありません。<br>鑑定をご依頼いただくと<br>こちらに表示されます。</div>
+        </div>
+      </div>
+    </div><!-- /tab-history -->
+
+    <button class="btn-outline" onclick="logout()">ログアウト</button>
+
+  </div>
+
+  <footer>© 香星命学</footer>
+
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzs6k1RpPw2CgZqQmkSVBjHrXbLeO5WCuU3nKBu0Ga7TFjKyOHdfoatt7kdlMiEL4sR0Q/exec';
+
+const PREFS = ['','北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+
+// 五行→五香変換
+function gogyoToKoko(gogyo) {
+  if (!gogyo) return '—';
+  return gogyo
+    .replace(/木(\d+)/g, '森香$1')
+    .replace(/火(\d+)/g, '焔香$1')
+    .replace(/土(\d+)/g, '穏香$1')
+    .replace(/金(\d+)/g, '澄香$1')
+    .replace(/水(\d+)/g, '流香$1')
+    .replace(/(森香\d+)(焔香)/g, '$1・$2')
+    .replace(/(焔香\d+)(穏香)/g, '$1・$2')
+    .replace(/(穏香\d+)(澄香)/g, '$1・$2')
+    .replace(/(澄香\d+)(流香)/g, '$1・$2');
+}
+
+const LIFF_ID = '2009167670-N4cS2VFK';
+const urlParams = new URLSearchParams(window.location.search);
+const urlUserId = urlParams.get('userId');
+let currentLineUserId = null; // グローバルで保持
+
+window.addEventListener('load', async () => {
+  // まずLIFF初期化を試みる
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    if (liff.isLoggedIn()) {
+      const profile = await liff.getProfile();
+      currentLineUserId = profile.userId;
+      loadUserByLineId(currentLineUserId);
+      return;
+    } else if (liff.isInClient()) {
+      // LIFF内ブラウザだがログインしていない場合
+      liff.login();
+      return;
+    }
+  } catch(e) {
+    console.log('LIFF init failed, falling back:', e);
+  }
+
+  // LIFF外（通常ブラウザ）のフォールバック
+  if (urlUserId) {
+    localStorage.setItem('koseiUserId', urlUserId);
+    document.getElementById('inputUserId').value = urlUserId;
+    loadUser();
+  } else {
+    const savedId = localStorage.getItem('koseiUserId');
+    if (savedId) {
+      document.getElementById('inputUserId').value = savedId;
+      loadUser();
+    }
+  }
+});
+
+async function loadUserByLineId(lineUserId) {
+  document.getElementById('loadingScreen').style.display = 'block';
+  document.getElementById('loginSection').style.display = 'none';
+  try {
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbwiDcr2nqVJa3U_dIRblveFdnAZjnGKkYRRNAS3OI8G7exBOs60eagkAJ1lHDjaILbOTA/exec?action=getUserByLineId&lineUserId=${encodeURIComponent(lineUserId)}`);
+    const data = await res.json();
+    if (data.error) {
+      // 未登録の場合は登録ページへ
+      window.location.href = 'register.html?lineUserId=' + encodeURIComponent(lineUserId);
+      return;
+    }
+    localStorage.setItem('koseiUserId', data.user.userId);
+    renderUser(data.user);
+  } catch(err) {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('loginSection').style.display = 'block';
+    showMsg('loginMsg', '通信エラーが発生しました。', 'error');
+  }
+}
+
+async function loadUser() {
+  const userId = document.getElementById('inputUserId').value.trim();
+  if (!userId) {
+    showMsg('loginMsg', '登録IDを入力してください。', 'error');
+    return;
+  }
+
+  document.getElementById('loadingScreen').style.display = 'block';
+  document.getElementById('loginSection').style.display = 'none';
+
+  try {
+    const lineId = currentLineUserId;
+    if (!lineId) return;
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbwiDcr2nqVJa3U_dIRblveFdnAZjnGKkYRRNAS3OI8G7exBOs60eagkAJ1lHDjaILbOTA/exec?action=getUserByLineId&lineUserId=${encodeURIComponent(lineId)}`);
+    const data = await res.json();
+
+    if (data.error) {
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+      showMsg('loginMsg', '登録IDが見つかりません。もう一度ご確認ください。', 'error');
+      return;
+    }
+
+    // userIdを保存
+    localStorage.setItem('koseiUserId', userId);
+
+    localStorage.setItem('koseiUserId', data.user.userId);
+    renderUser(data.user);
+
+  } catch(err) {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('loginSection').style.display = 'block';
+    showMsg('loginMsg', '通信エラーが発生しました。', 'error');
+  }
+}
+
+function renderUser(u) {
+  document.getElementById('m-year').textContent   = u.yearPillar  || '—';
+  document.getElementById('m-month').textContent  = u.monthPillar || '—';
+  document.getElementById('m-day').textContent    = u.dayPillar   || '—';
+  document.getElementById('m-gogyo').textContent  = gogyoToKoko(u.gogyo);
+  document.getElementById('m-tenchu').textContent = u.tenchu      || '—';
+  document.getElementById('m-sun').textContent    = u.sunSign     || '—';
+  document.getElementById('m-moon').textContent   = u.moonSign    || '—';
+  document.getElementById('m-venus').textContent  = u.venusSign   || '—';
+  document.getElementById('e-name').value = u.name || '';
+  document.getElementById('e-birthDate').value = (u.birthDate || '').replace(/\//g, '-');
+  document.getElementById('e-partnerName').value = u.partnerName || '';
+  document.getElementById('e-partnerBirthDate').value = (u.partnerBirthDate || '').replace(/\//g, '-');
+  setSelect('e-prefecture', u.prefecture);
+  setSelect('e-partnerPrefecture', u.partnerPrefecture);
+  renderPurchaseInfo(u);
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('mainSection').style.display = 'block';
+}
+
+function setSelect(id, value) {
+  const sel = document.getElementById(id);
+  for (let opt of sel.options) {
+    if (opt.value === value) { opt.selected = true; break; }
+  }
+}
+
+async function updateUser() {
+  const userId = localStorage.getItem('koseiUserId');
+  const lineUserId = currentLineUserId;
+  console.log('updateUser: userId='+userId+' lineUserId='+lineUserId);
+  const name      = document.getElementById('e-name').value.trim();
+  const birthDate = document.getElementById('e-birthDate').value;
+  const prefecture = document.getElementById('e-prefecture').value;
+  const partnerName       = document.getElementById('e-partnerName').value.trim();
+  const partnerBirthDate  = document.getElementById('e-partnerBirthDate').value;
+  const partnerPrefecture = document.getElementById('e-partnerPrefecture').value;
+
+  if (!name) { showMsg('updateMsg', 'お名前を入力してください。', 'error'); return; }
+  if (!birthDate) { showMsg('updateMsg', '生年月日を選択してください。', 'error'); return; }
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'update',
+        userId, lineUserId, name, birthDate, prefecture,
+        partnerName, partnerBirthDate, partnerPrefecture
+      })
+    });
+    const data = await res.json();
+
+    if (data.error) {
+      showMsg('updateMsg', data.error, 'error');
+      return;
+    }
+
+    showMsg('updateMsg', '情報を更新しました。', 'success');
+
+    // 命式を再取得して表示を更新
+    setTimeout(() => loadUserSilent(userId), 500);
+
+  } catch(err) {
+    showMsg('updateMsg', '通信エラーが発生しました。', 'error');
+  }
+}
+
+async function loadUserSilent(userId) {
+  try {
+    const lineId = currentLineUserId;
+    if (!lineId) return;
+    const res = await fetch(`https://script.google.com/macros/s/AKfycbwiDcr2nqVJa3U_dIRblveFdnAZjnGKkYRRNAS3OI8G7exBOs60eagkAJ1lHDjaILbOTA/exec?action=getUserByLineId&lineUserId=${encodeURIComponent(lineId)}`);
+    const data = await res.json();
+    if (data.user) renderUser(data.user);
+  } catch(e) {}
+}
+
+function logout() {
+  localStorage.removeItem('koseiUserId');
+  document.getElementById('mainSection').style.display = 'none';
+  document.getElementById('loginSection').style.display = 'block';
+  document.getElementById('inputUserId').value = '';
+}
+
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  const idx = ['tab-basic','tab-purchase','tab-history'].indexOf(tabId);
+  document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+}
+
+function renderPurchaseInfo(user) {
+  const expire = user.chatExpire || '';
+  const badge = document.getElementById('chat-status-badge');
+  const expireText = document.getElementById('chat-expire-text');
+  const today = new Date().toISOString().slice(0,10).replace(/-/g,'/');
+
+  if (expire && expire !== '' && expire !== '期限切れ' && expire.replace(/-/g,'/') > today) {
+    badge.textContent = '対話中';
+    badge.className = 'status-badge active';
+    expireText.textContent = `期限：${expire}`;
+  } else {
+    badge.textContent = '未加入';
+    badge.className = 'status-badge inactive';
+    expireText.textContent = '';
+  }
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (type === 'success') {
+    const now = new Date();
+    const ts = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    el.textContent = `${text}（${ts}）`;
+  } else {
+    el.textContent = text;
+  }
+  el.className = 'msg ' + type;
+}
+</script>
+</body>
+</html>
