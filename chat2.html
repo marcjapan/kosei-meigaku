@@ -120,6 +120,7 @@
 
   .msg-wrap.user {
     justify-content: flex-end;
+    padding-left: 8%;
   }
 
   .msg-wrap.ai {
@@ -147,7 +148,7 @@
   }
 
   .bubble {
-    max-width: 82%;
+    max-width: 88%;
     padding: 12px 16px;
     border-radius: 16px;
     font-size: 13.5px;
@@ -600,7 +601,6 @@ sendBtn.addEventListener('click', sendMessage);
 // LIFF初期化
 async function init() {
   try {
-    alert("init開始 LIFF_ID=" + LIFF_ID);
     await liff.init({ liffId: LIFF_ID });
 
     if (!liff.isLoggedIn()) {
