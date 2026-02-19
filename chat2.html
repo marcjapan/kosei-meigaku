@@ -544,17 +544,12 @@ async function sendMessage() {
   showTyping();
 
   try {
-    const params = new URLSearchParams({
-      action: 'chat',
-      lineUserId,
-      message: text
-    });
     const rawText = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', WEBHOOK_URL + '?' + params.toString(), true);
+      xhr.open('POST', WEBHOOK_URL, true);
       xhr.onload = () => resolve(xhr.responseText);
       xhr.onerror = () => reject(new Error('XHR failed'));
-      xhr.send();
+      xhr.send(JSON.stringify({ action: 'chat', lineUserId, message: text }));
     });
     let data;
     try { data = JSON.parse(rawText); } catch(e) { data = {}; }
