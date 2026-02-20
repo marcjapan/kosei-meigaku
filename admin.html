@@ -410,22 +410,32 @@ async function sendReading() {
       }
     }
 
-    // 鑑定データをFirestoreに保存＋LINE通知（GETパラメータ方式）
+    // Step1: GAS API（no-cors POST）でFirestoreにsectionsを保存
     status.textContent = 'Firestoreに保存中…';
-    const saveUrl = 'https://script.google.com/macros/s/AKfycbwiDcr2nqVJa3U_dIRblveFdnAZjnGKkYRRNAS3OI8G7exBOs60eagkAJ1lHDjaILbOTA/exec?action=saveReading'
+    await fetch(GAS_API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'saveReading',
+        lineUserId: selectedUser.lineUserId,
+        userName: selectedUser.name,
+        readingDate,
+        sections,
+        pdfUrl: finalPdfUrl || ''
+      })
+    });
+
+    // Step2: 2秒待ってwebhook GETでLINE通知を送信
+    status.textContent = 'LINE通知を送信中…';
+    await new Promise(r => setTimeout(r, 2000));
+    const notifyUrl = 'https://script.google.com/macros/s/AKfycbwiDcr2nqVJa3U_dIRblveFdnAZjnGKkYRRNAS3OI8G7exBOs60eagkAJ1lHDjaILbOTA/exec?action=notifyReading'
       + '&lineUserId=' + encodeURIComponent(selectedUser.lineUserId)
-      + '&userName='   + encodeURIComponent(selectedUser.name)
-      + '&readingDate='+ encodeURIComponent(readingDate)
-      + '&pdfUrl='     + encodeURIComponent(finalPdfUrl || '')
-      + '&sections='   + encodeURIComponent(JSON.stringify(sections));
-    const saveRes = await fetch(saveUrl);
-    const saveData = await saveRes.json();
-    if (saveData.message || saveData.status === 200) {
-      status.className = 'status-ok';
-      status.textContent = `✅ 送信完了\n${selectedUser.name}様に鑑定書を届けました。`;
-    } else {
-      throw new Error(JSON.stringify(saveData));
-    }
+      + '&userName='   + encodeURIComponent(selectedUser.name);
+    await fetch(notifyUrl);
+
+    status.className = 'status-ok';
+    status.textContent = `✅ 送信完了\n${selectedUser.name}様に鑑定書を届けました。`;
   } catch(e) {
     status.className = 'status-err';
     status.textContent = '❌ エラーが発生しました\n' + e.message;
