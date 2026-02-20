@@ -410,10 +410,11 @@ async function sendReading() {
       }
     }
 
-    // 鑑定データをFirestoreに保存＋LINE通知
+    // 鑑定データをFirestoreに保存＋LINE通知（no-corsで送信）
     status.textContent = 'Firestoreに保存中…';
-    const res = await fetch(GAS_API_URL, {
+    await fetch(GAS_API_URL, {
       method: 'POST',
+      mode: 'no-cors',
       headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
         action: 'saveReading',
@@ -424,13 +425,18 @@ async function sendReading() {
         pdfUrl: finalPdfUrl || ''
       })
     });
-    const data = await res.json();
 
-    if (data.status === 200 || data.message) {
+    // no-corsはレスポンスが読めないので2秒後にgetReadingで保存確認
+    status.textContent = '確認中…';
+    await new Promise(r => setTimeout(r, 2000));
+    const checkRes = await fetch(GAS_API_URL + '?action=getReading&lineUserId=' + encodeURIComponent(selectedUser.lineUserId));
+    const checkData = await checkRes.json();
+
+    if (checkData.reading) {
       status.className = 'status-ok';
       status.textContent = `✅ 送信完了\n${selectedUser.name}様に鑑定書を届けました。`;
     } else {
-      throw new Error(JSON.stringify(data));
+      throw new Error('保存確認できませんでした');
     }
   } catch(e) {
     status.className = 'status-err';
