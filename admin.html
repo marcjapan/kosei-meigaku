@@ -410,25 +410,22 @@ async function sendReading() {
       }
     }
 
-    // 鑑定データをFirestoreに保存＋LINE通知（XHRで送信）
+    // 鑑定データをFirestoreに保存＋LINE通知（GETパラメータ方式）
     status.textContent = 'Firestoreに保存中…';
-    await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://script.google.com/macros/s/AKfycbwiDcr2nqVJa3U_dIRblveFdnAZjnGKkYRRNAS3OI8G7exBOs60eagkAJ1lHDjaILbOTA/exec', true);
-      xhr.onload = () => resolve(xhr.responseText);
-      xhr.onerror = () => reject(new Error('通信エラー'));
-      xhr.send(JSON.stringify({
-        action: 'saveReading',
-        lineUserId: selectedUser.lineUserId,
-        userName: selectedUser.name,
-        readingDate,
-        sections,
-        pdfUrl: finalPdfUrl || ''
-      }));
-    });
-
-    status.className = 'status-ok';
-    status.textContent = `✅ 送信完了\n${selectedUser.name}様に鑑定書を届けました。`;
+    const saveUrl = 'https://script.google.com/macros/s/AKfycbwiDcr2nqVJa3U_dIRblveFdnAZjnGKkYRRNAS3OI8G7exBOs60eagkAJ1lHDjaILbOTA/exec?action=saveReading'
+      + '&lineUserId=' + encodeURIComponent(selectedUser.lineUserId)
+      + '&userName='   + encodeURIComponent(selectedUser.name)
+      + '&readingDate='+ encodeURIComponent(readingDate)
+      + '&pdfUrl='     + encodeURIComponent(finalPdfUrl || '')
+      + '&sections='   + encodeURIComponent(JSON.stringify(sections));
+    const saveRes = await fetch(saveUrl);
+    const saveData = await saveRes.json();
+    if (saveData.message || saveData.status === 200) {
+      status.className = 'status-ok';
+      status.textContent = `✅ 送信完了\n${selectedUser.name}様に鑑定書を届けました。`;
+    } else {
+      throw new Error(JSON.stringify(saveData));
+    }
   } catch(e) {
     status.className = 'status-err';
     status.textContent = '❌ エラーが発生しました\n' + e.message;
