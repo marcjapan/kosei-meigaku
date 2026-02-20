@@ -224,16 +224,23 @@ async function init() {
     const profile = await liff.getProfile();
     const lineUserId = profile.userId;
 
+    // docIdがURLパラメータにあれば特定の鑑定を、なければ最新を表示
+    const liffState = new URLSearchParams(window.location.search).get('liff.state') || '';
+    const docIdParam = new URLSearchParams(liffState.startsWith('?') ? liffState : '?' + liffState).get('docId')
+                    || new URLSearchParams(window.location.search).get('docId') || '';
     const res = await fetch(`${GAS_API_URL}?action=getReading&lineUserId=${encodeURIComponent(lineUserId)}`);
     const data = await res.json();
 
-    if (!data.reading) {
+    if (!data.readings || data.readings.length === 0) {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('error-view').style.display = 'flex';
       return;
     }
 
-    renderReading(data.reading);
+    const reading = docIdParam
+      ? (data.readings.find(r => r.docId === docIdParam) || data.readings[0])
+      : data.readings[0];
+    renderReading(reading);
     document.getElementById('loading').style.display = 'none';
     document.getElementById('reading-view').style.display = 'block';
     document.getElementById('nav-bar').style.display = 'flex';
