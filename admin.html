@@ -397,7 +397,7 @@ async function sendReading() {
       const base64 = await fileToBase64(pdfFile);
       const uploadRes = await fetch(GAS_API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({
           action: 'uploadPdf',
           fileName: `${selectedUser.name}_鑑定書_${readingDateRaw}.pdf`,
@@ -414,7 +414,7 @@ async function sendReading() {
     status.textContent = 'Firestoreに保存中…';
     const res = await fetch(GAS_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({
         action: 'saveReading',
         lineUserId: selectedUser.lineUserId,
