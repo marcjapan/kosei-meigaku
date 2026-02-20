@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>香星命学 管理画面</title>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f0e0c;
+    --surface: #1a1710;
+    --border: rgba(184,151,90,0.2);
+    --gold: #b8975a;
+    --gold2: #d4af6a;
+    --text: #e8e0d0;
+    --muted: #8a7d6a;
+    --ink: #2c1f14;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px; min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ヘッダー */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .header-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 15px; letter-spacing: 0.1em; color: var(--gold);
+  }
+
+  /* メイン */
+  .main { max-width: 720px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* セクション */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 12px; letter-spacing: 0.12em;
+    color: var(--gold); margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* フォーム */
+  label {
+    display: block; font-size: 11px; color: var(--muted);
+    letter-spacing: 0.06em; margin-bottom: 5px;
+  }
+  select, input[type="text"], input[type="date"], textarea {
+    width: 100%; background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); font-family: inherit; font-size: 13px;
+    padding: 9px 11px; outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 14px;
+  }
+  select:focus, input:focus, textarea:focus {
+    border-color: var(--gold);
+  }
+  textarea { resize: vertical; line-height: 1.8; }
+  select option { background: #1a1710; }
+
+  /* セクション追加 */
+  .sections-list { margin-bottom: 12px; }
+  .section-item {
+    background: rgba(184,151,90,0.05);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px; margin-bottom: 8px;
+  }
+  .section-item-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .section-item-title {
+    font-size: 11px; color: var(--gold); letter-spacing: 0.08em;
+  }
+  .btn-remove {
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; font-size: 16px; line-height: 1;
+    padding: 2px 4px;
+  }
+  .btn-remove:hover { color: #e07070; }
+  .section-item input, .section-item textarea {
+    margin-bottom: 8px;
+  }
+
+  /* ボタン群 */
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 9px 18px; border-radius: 20px; cursor: pointer;
+    font-family: 'Shippori Mincho', serif; font-size: 12px;
+    letter-spacing: 0.08em; border: none; transition: all 0.2s;
+  }
+  .btn-outline {
+    background: transparent; border: 1px solid var(--gold);
+    color: var(--gold);
+  }
+  .btn-outline:hover { background: rgba(184,151,90,0.1); }
+  .btn-primary {
+    background: linear-gradient(135deg, #0a3d6b, #1a6b3a);
+    color: #fff;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-danger {
+    background: transparent; border: 1px solid #e07070;
+    color: #e07070;
+  }
+
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+
+  /* PDF */
+  .pdf-upload-area {
+    border: 1.5px dashed var(--border); border-radius: 6px;
+    padding: 20px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s; margin-bottom: 14px;
+  }
+  .pdf-upload-area:hover { border-color: var(--gold); }
+  .pdf-upload-area input { display: none; }
+  .pdf-name {
+    font-size: 11px; color: var(--gold); margin-top: 6px;
+    word-break: break-all;
+  }
+
+  /* プレビュー */
+  .preview-badge {
+    display: inline-block; padding: 2px 8px;
+    background: rgba(184,151,90,0.15);
+    border: 1px solid var(--border); border-radius: 10px;
+    font-size: 10px; color: var(--gold); letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  /* 送信ステータス */
+  #send-status {
+    padding: 12px 16px; border-radius: 6px;
+    font-size: 12px; display: none; margin-top: 12px;
+    letter-spacing: 0.04em; line-height: 1.8;
+  }
+  .status-ok { background: rgba(40,160,80,0.1); border: 1px solid rgba(40,160,80,0.3); color: #60c080; }
+  .status-err { background: rgba(220,60,60,0.1); border: 1px solid rgba(220,60,60,0.3); color: #e07070; }
+  .status-loading { background: rgba(184,151,90,0.08); border: 1px solid var(--border); color: var(--muted); }
+
+  /* ユーザー情報 */
+  .user-badge {
+    background: rgba(184,151,90,0.08);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px 14px; margin-bottom: 14px;
+    font-size: 12px; display: none;
+  }
+  .user-badge .name { color: var(--gold2); font-size: 14px; margin-bottom: 4px; }
+  .user-badge .meta { color: var(--muted); font-size: 11px; line-height: 1.8; }
+
+  /* パスワード画面 */
+  #auth-screen {
+    position: fixed; inset: 0; background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 99;
+  }
+  .auth-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 32px 28px; width: 280px;
+    text-align: center;
+  }
+  .auth-title {
+    font-family: 'Shippori Mincho', serif;
+    color: var(--gold); font-size: 14px; letter-spacing: 0.1em;
+    margin-bottom: 20px;
+  }
+  .auth-box input {
+    text-align: center; letter-spacing: 0.2em; margin-bottom: 16px;
+  }
+  .auth-err { color: #e07070; font-size: 11px; margin-top: 8px; display: none; }
+</style>
+</head>
+<body>
+
+<!-- 認証画面 -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-title">🕯️ 管理画面</div>
+    <label>パスワード</label>
+    <input type="password" id="auth-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkAuth()">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="checkAuth()">入室する</button>
+    <div class="auth-err" id="auth-err">パスワードが違います</div>
+  </div>
+</div>
+
+<!-- ヘッダー -->
+<div class="header">
+  <span style="font-size:18px;">🕯️</span>
+  <span class="header-title">香星命学 ｜ 本鑑定 管理画面</span>
+</div>
+
+<div class="main">
+
+  <!-- Step1: ユーザー選択 -->
+  <div class="card">
+    <div class="card-title">STEP 1 ｜ 鑑定対象者を選ぶ</div>
+    <label>ユーザー</label>
+    <select id="user-select" onchange="onUserSelect()">
+      <option value="">-- 読み込み中 --</option>
+    </select>
+    <div class="user-badge" id="user-badge">
+      <div class="name" id="badge-name"></div>
+      <div class="meta" id="badge-meta"></div>
+    </div>
+  </div>
+
+  <!-- Step2: 鑑定日 -->
+  <div class="card">
+    <div class="card-title">STEP 2 ｜ 鑑定日</div>
+    <label>鑑定日</label>
+    <input type="date" id="reading-date">
+  </div>
+
+  <!-- Step3: 本文セクション -->
+  <div class="card">
+    <div class="card-title">STEP 3 ｜ 鑑定文（セクションごとに入力）</div>
+    <div class="sections-list" id="sections-list"></div>
+    <button class="btn btn-outline" onclick="addSection()">＋ セクションを追加</button>
+  </div>
+
+  <!-- Step4: PDF -->
+  <div class="card">
+    <div class="card-title">STEP 4 ｜ PDF（任意）</div>
+    <div class="pdf-upload-area" onclick="document.getElementById('pdf-file').click()">
+      <input type="file" id="pdf-file" accept="application/pdf" onchange="onPdfSelect()">
+      <div style="color:var(--muted); font-size:12px;">タップしてPDFを選択</div>
+      <div class="pdf-name" id="pdf-name"></div>
+    </div>
+    <label>または Google Drive の共有URL</label>
+    <input type="text" id="pdf-url" placeholder="https://drive.google.com/...">
+  </div>
+
+  <!-- 送信 -->
+  <div class="card">
+    <div class="card-title">STEP 5 ｜ 確認して送信</div>
+    <p style="color:var(--muted); font-size:12px; line-height:1.9; margin-bottom:16px;">
+      送信すると、Firestoreに鑑定データが保存され、<br>
+      対象者にLINEで通知が届きます。
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="send-btn" onclick="sendReading()">🕯️ 鑑定書を送信する</button>
+    </div>
+    <div id="send-status"></div>
+  </div>
+
+</div>
+
+<script>
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzs6k1RpPw2CgZqQmkSVBjHrXbLeO5WCuU3nKBu0Ga7TFjKyOHdfoatt7kdlMiEL4sR0Q/exec';
+const ADMIN_PASSWORD = 'kosei2026'; // ← 変更してください
+let users = [];
+let selectedUser = null;
+let sectionCount = 0;
+
+// 認証
+function checkAuth() {
+  const pw = document.getElementById('auth-pw').value;
+  if (pw === ADMIN_PASSWORD) {
+    document.getElementById('auth-screen').style.display = 'none';
+    loadUsers();
+    initDate();
+    addSection(); // デフォルト1つ
+  } else {
+    document.getElementById('auth-err').style.display = 'block';
+  }
+}
+
+// 初期日付
+function initDate() {
+  const today = new Date().toISOString().slice(0, 10);
+  document.getElementById('reading-date').value = today;
+}
+
+// ユーザー一覧取得
+async function loadUsers() {
+  try {
+    const res = await fetch(`${GAS_API_URL}?action=getAllUsers`);
+    const data = await res.json();
+    users = data.users || [];
+    const sel = document.getElementById('user-select');
+    sel.innerHTML = '<option value="">-- 対象者を選択してください --</option>';
+    users.forEach(u => {
+      const opt = document.createElement('option');
+      opt.value = u.lineUserId;
+      opt.textContent = `${u.name}（${u.birthDate}）`;
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+// ユーザー選択
+function onUserSelect() {
+  const lineUserId = document.getElementById('user-select').value;
+  selectedUser = users.find(u => u.lineUserId === lineUserId) || null;
+  const badge = document.getElementById('user-badge');
+  if (selectedUser) {
+    document.getElementById('badge-name').textContent = selectedUser.name + ' 様';
+    document.getElementById('badge-meta').textContent =
+      `生年月日：${selectedUser.birthDate}　日柱：${selectedUser.dayPillar}\n五香：${selectedUser.gogyo}　循香期：${selectedUser.tenchu}`;
+    badge.style.display = 'block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// セクション追加
+function addSection() {
+  sectionCount++;
+  const id = 'sec-' + sectionCount;
+  const el = document.createElement('div');
+  el.className = 'section-item';
+  el.id = id;
+  el.innerHTML = `
+    <div class="section-item-header">
+      <div class="section-item-title">セクション ${sectionCount}</div>
+      <button class="btn-remove" onclick="removeSection('${id}')">×</button>
+    </div>
+    <label>タイトル（例：命の核、いまここ）</label>
+    <input type="text" class="sec-title" placeholder="今年の流れ">
+    <label>本文</label>
+    <textarea class="sec-body" rows="6" placeholder="鑑定文をここに入力…"></textarea>
+  `;
+  document.getElementById('sections-list').appendChild(el);
+}
+
+function removeSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// PDF選択
+function onPdfSelect() {
+  const file = document.getElementById('pdf-file').files[0];
+  if (file) {
+    document.getElementById('pdf-name').textContent = '📎 ' + file.name;
+  }
+}
+
+// セクションデータ収集
+function collectSections() {
+  const items = document.querySelectorAll('.section-item');
+  const sections = [];
+  items.forEach(item => {
+    const title = item.querySelector('.sec-title').value.trim();
+    const body = item.querySelector('.sec-body').value.trim();
+    if (title || body) sections.push({ title, body });
+  });
+  return sections;
+}
+
+// 送信
+async function sendReading() {
+  if (!selectedUser) { alert('対象者を選択してください'); return; }
+  const sections = collectSections();
+  if (sections.length === 0) { alert('鑑定文を入力してください'); return; }
+
+  const readingDateRaw = document.getElementById('reading-date').value;
+  const readingDate = readingDateRaw
+    ? new Date(readingDateRaw).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })
+    : '—';
+
+  const pdfUrl = document.getElementById('pdf-url').value.trim();
+  const pdfFile = document.getElementById('pdf-file').files[0];
+
+  const btn = document.getElementById('send-btn');
+  const status = document.getElementById('send-status');
+  btn.disabled = true;
+  status.className = 'status-loading';
+  status.style.display = 'block';
+  status.textContent = '送信中…';
+
+  try {
+    let finalPdfUrl = pdfUrl;
+
+    // PDFファイルがあればBase64でアップロード
+    if (pdfFile && !pdfUrl) {
+      status.textContent = 'PDFをアップロード中…';
+      const base64 = await fileToBase64(pdfFile);
+      const uploadRes = await fetch(GAS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'uploadPdf',
+          fileName: `${selectedUser.name}_鑑定書_${readingDateRaw}.pdf`,
+          base64: base64
+        })
+      });
+      const uploadData = await uploadRes.json();
+      if (uploadData.url) {
+        finalPdfUrl = uploadData.url;
+      }
+    }
+
+    // 鑑定データをFirestoreに保存＋LINE通知
+    status.textContent = 'Firestoreに保存中…';
+    const res = await fetch(GAS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'saveReading',
+        lineUserId: selectedUser.lineUserId,
+        userName: selectedUser.name,
+        readingDate,
+        sections,
+        pdfUrl: finalPdfUrl || ''
+      })
+    });
+    const data = await res.json();
+
+    if (data.status === 200 || data.message) {
+      status.className = 'status-ok';
+      status.textContent = `✅ 送信完了\n${selectedUser.name}様に鑑定書を届けました。`;
+    } else {
+      throw new Error(JSON.stringify(data));
+    }
+  } catch(e) {
+    status.className = 'status-err';
+    status.textContent = '❌ エラーが発生しました\n' + e.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// ファイルをBase64に変換
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>
